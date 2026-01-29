@@ -127,6 +127,8 @@ class State(StateBase):
 
 class DetailedRiskProfile(BaseModel):
     village: Village
+    district: str
+    state: str
     overall_risk_score: float
     risk_scores: dict  # {flood, cyclone, rainfall, erosion}
     risk_category: str

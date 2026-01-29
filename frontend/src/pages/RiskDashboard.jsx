@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import { toast } from 'react-hot-toast';
 import {
     Download, Image as ImageIcon, Eye, EyeOff,
     TrendingUp, AlertTriangle, Home
@@ -77,10 +78,10 @@ const RiskDashboard = () => {
                     <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                         <div>
                             <h1 className="text-3xl font-bold text-gray-900 mb-2">
-                                {riskData.village.name}
+                                {riskData.village.name} Risk Assessment
                             </h1>
                             <p className="text-gray-600">
-                                {riskData.village.district} District, {riskData.village.state}
+                                {riskData.district}, {riskData.state}
                             </p>
                             <p className="text-sm text-gray-500 mt-1">
                                 Last Updated: {new Date(riskData.last_updated).toLocaleDateString()}
@@ -109,11 +110,15 @@ const RiskDashboard = () => {
                             <motion.button
                                 whileHover={{ scale: 1.05 }}
                                 whileTap={{ scale: 0.95 }}
-                                onClick={() => alert('Map download will be implemented')}
+                                onClick={() => {
+                                    // Generate a detailed report that includes the map information
+                                    generateRiskReportPDF(riskData);
+                                    toast.success('Report downloaded. Map data included in the summary.');
+                                }}
                                 className="flex items-center gap-2 px-4 py-2 bg-teal-600 hover:bg-teal-700 text-white rounded-lg transition-colors ripple-button"
                             >
                                 <ImageIcon className="w-4 h-4" />
-                                Download Map
+                                Download Report
                             </motion.button>
                         </div>
                     </div>

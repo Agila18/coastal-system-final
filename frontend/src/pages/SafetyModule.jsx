@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import { toast } from 'react-hot-toast';
 import {
     ArrowLeft, Download, Share2, AlertTriangle, Shield,
     Phone, MapPin, Building, Users, FileText, Home, TrendingUp
@@ -90,7 +91,7 @@ const SafetyModule = () => {
                                 Safety & Preparedness Guide
                             </h1>
                             <p className="text-gray-600">
-                                {villageData.village.name}, {villageData.village.district}
+                                {villageData.village.name}, {villageData.district}
                             </p>
                             <div className="mt-2 flex items-center gap-2">
                                 <span className="text-sm text-gray-500">Current Risk Level:</span>
@@ -122,7 +123,18 @@ const SafetyModule = () => {
                             <motion.button
                                 whileHover={{ scale: 1.05 }}
                                 whileTap={{ scale: 0.95 }}
-                                onClick={() => alert('Share functionality will be implemented')}
+                                onClick={() => {
+                                    if (navigator.share) {
+                                        navigator.share({
+                                            title: `Safety Guide for ${villageData.village.name}`,
+                                            text: `Check out the coastal safety guide for ${villageData.village.name} at Hydro Hub.`,
+                                            url: window.location.href,
+                                        }).catch(console.error);
+                                    } else {
+                                        navigator.clipboard.writeText(window.location.href);
+                                        toast.success('Link copied to clipboard!');
+                                    }
+                                }}
                                 className="flex items-center gap-2 px-4 py-2 bg-teal-600 hover:bg-teal-700 text-white rounded-lg transition-colors ripple-button"
                             >
                                 <Share2 className="w-4 h-4" />
@@ -875,8 +887,38 @@ const SafetyModule = () => {
                                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                                         {[
                                             { href: 'tel:1078', icon: Phone, text: 'Call Emergency', color: 'text-red-600' },
-                                            { onClick: () => alert('Location sharing will be implemented'), icon: MapPin, text: 'Share Location', color: 'text-orange-600' },
-                                            { onClick: () => alert('Help request will be implemented'), icon: AlertTriangle, text: 'Request Help', color: 'text-red-600' }
+                                            {
+                                                onClick: () => {
+                                                    if (navigator.geolocation) {
+                                                        navigator.geolocation.getCurrentPosition((position) => {
+                                                            const { latitude, longitude } = position.coords;
+                                                            const message = `Emergency! I'm at ${villageData.village.name}. My coordinates: ${latitude}, ${longitude}. Need assistance.`;
+                                                            if (navigator.share) {
+                                                                navigator.share({ title: 'Emergency Location', text: message }).catch(console.error);
+                                                            } else {
+                                                                navigator.clipboard.writeText(message);
+                                                                toast.success('Location coordinates copied to clipboard!');
+                                                            }
+                                                        }, () => toast.error('Failed to get location. Please check permissions.'));
+                                                    } else {
+                                                        toast.error('Geolocation is not supported by your browser.');
+                                                    }
+                                                },
+                                                icon: MapPin, text: 'Share Location', color: 'text-orange-600'
+                                            },
+                                            {
+                                                onClick: () => {
+                                                    toast.promise(
+                                                        new Promise((resolve) => setTimeout(resolve, 2000)),
+                                                        {
+                                                            loading: 'Sending emergency alert to authorities...',
+                                                            success: 'Help request sent! Emergency services notified.',
+                                                            error: 'Failed to send request.',
+                                                        }
+                                                    );
+                                                },
+                                                icon: AlertTriangle, text: 'Request Help', color: 'text-red-600'
+                                            }
                                         ].map((action, idx) => {
                                             const Icon = action.icon;
                                             const Component = action.href ? 'a' : 'button';

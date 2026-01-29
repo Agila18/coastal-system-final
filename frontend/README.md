@@ -17,20 +17,16 @@ A stunning full-screen hero section for Hydro Hub - Tamil Nadu's coastal risk pr
 - Tailwind CSS 3
 - Pure CSS animations (no external animation libraries)
 
-## Installation
+## Installation & Setup
+
+For full-stack setup instructions (including Backend and Database), please refer to the **[Main README](../README.md)**.
+
+### Quick Start (Frontend Only)
 
 ```bash
-cd frontend
 npm install
-```
-
-## Running the App
-
-```bash
 npm start
 ```
-
-The app will open at [http://localhost:3000](http://localhost:3000)
 
 ## Build for Production
 

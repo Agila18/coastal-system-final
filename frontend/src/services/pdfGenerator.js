@@ -1,5 +1,5 @@
 import jsPDF from 'jspdf';
-import 'jspdf-autotable';
+import autoTable from 'jspdf-autotable';
 
 export const generateRiskReportPDF = (villageData) => {
     const doc = new jsPDF();
@@ -27,8 +27,8 @@ export const generateRiskReportPDF = (villageData) => {
     doc.setFontSize(11);
     doc.setFont(undefined, 'normal');
     doc.text(`Village: ${villageData.village.name}`, 20, 65);
-    doc.text(`District: ${villageData.village.district}`, 20, 72);
-    doc.text(`State: ${villageData.village.state}`, 20, 79);
+    doc.text(`District: ${villageData.district || 'N/A'}`, 20, 72);
+    doc.text(`State: ${villageData.state || 'N/A'}`, 20, 79);
     doc.text(`Date: ${new Date(villageData.last_updated || Date.now()).toLocaleDateString()}`, 20, 86);
 
     // Overall Risk Score
@@ -46,7 +46,7 @@ export const generateRiskReportPDF = (villageData) => {
     doc.text(`Risk Category: ${riskCategory}`, 20, 120);
 
     // Individual Risk Scores Table
-    doc.autoTable({
+    autoTable(doc, {
         startY: 130,
         head: [['Risk Type', 'Score (0-100)']],
         body: [
@@ -65,7 +65,7 @@ export const generateRiskReportPDF = (villageData) => {
     doc.setFont(undefined, 'bold');
     doc.text('Environmental Indicators', 20, finalY1);
 
-    doc.autoTable({
+    autoTable(doc, {
         startY: finalY1 + 5,
         head: [['Indicator', 'Value (0-10 scale)']],
         body: [
@@ -87,7 +87,7 @@ export const generateRiskReportPDF = (villageData) => {
     doc.setFont(undefined, 'bold');
     doc.text('Settlement Indicators', 20, 20);
 
-    doc.autoTable({
+    autoTable(doc, {
         startY: 25,
         head: [['Indicator', 'Value (0-10 scale)']],
         body: [
@@ -157,13 +157,13 @@ export const generateSafetyGuidePDF = (villageData) => {
     doc.setTextColor(0, 0, 0);
     doc.setFontSize(16);
     doc.setFont(undefined, 'bold');
-    doc.text(`${villageData.village.name}, ${villageData.village.district}`, 20, 55);
+    doc.text(`${villageData.village.name}, ${villageData.district || ''}`, 20, 55);
 
     // Emergency Contacts
     doc.setFontSize(14);
     doc.text('Emergency Contact Numbers', 20, 70);
 
-    doc.autoTable({
+    autoTable(doc, {
         startY: 75,
         head: [['Service', 'Contact Number']],
         body: [
@@ -207,4 +207,89 @@ export const generateSafetyGuidePDF = (villageData) => {
 
     // Save
     doc.save(`${villageData.village.name}_Safety_Guide.pdf`);
+};
+
+export const generatePredictionReportPDF = (villageData, predictions) => {
+    const doc = new jsPDF();
+    const pageWidth = doc.internal.pageSize.width;
+
+    // Header
+    doc.setFillColor(79, 70, 229); // Indigo
+    doc.rect(0, 0, pageWidth, 40, 'F');
+
+    doc.setTextColor(255, 255, 255);
+    doc.setFontSize(24);
+    doc.setFont(undefined, 'bold');
+    doc.text('14-Day Risk Forecast Report', 20, 25);
+
+    doc.setTextColor(255, 255, 255);
+    doc.setFontSize(12);
+    doc.setFont(undefined, 'normal');
+    doc.text(`Village: ${villageData.village.name} | Period: ${new Date().toLocaleDateString()} - ${new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toLocaleDateString()}`, 20, 35);
+
+    // Impact Overview
+    doc.setTextColor(0, 0, 0);
+    doc.setFontSize(18);
+    doc.setFont(undefined, 'bold');
+    doc.text('Impact Analysis', 20, 55);
+
+    autoTable(doc, {
+        startY: 60,
+        head: [['Category', 'Impact Score (0-10)', 'Key Findings']],
+        body: [
+            ['Economic Impact', predictions.economic_impact_score.toString(), `${(predictions.economic_impact_score * 10).toFixed(0)}-${(predictions.economic_impact_score * 15).toFixed(0)} Crores est. damage`],
+            ['Community Impact', predictions.community_impact_score.toString(), `${(predictions.community_impact_score * 1500).toFixed(0)} people potentially at risk`]
+        ],
+        theme: 'striped',
+        headStyles: { fillColor: [79, 70, 229] }
+    });
+
+    // 14-Day Forecast Table
+    const finalY = doc.lastAutoTable.finalY + 15;
+    doc.setFontSize(18);
+    doc.setFont(undefined, 'bold');
+    doc.text('14-Day Forecast Calendar', 20, finalY);
+
+    const forecastBody = predictions.forecast.map((day, index) => [
+        `Day ${index + 1}`,
+        new Date(day.for_date).toLocaleDateString(),
+        Math.round(day.predicted_risk_score).toString(),
+        day.predicted_risk_score >= 76 ? 'EXTREME' :
+            day.predicted_risk_score >= 51 ? 'HIGH' :
+                day.predicted_risk_score >= 26 ? 'MODERATE' : 'LOW'
+    ]);
+
+    autoTable(doc, {
+        startY: finalY + 5,
+        head: [['Day', 'Date', 'Risk Score', 'Category']],
+        body: forecastBody,
+        theme: 'grid',
+        headStyles: { fillColor: [79, 70, 229] },
+        columnStyles: {
+            2: { fontStyle: 'bold' }
+        },
+        didDrawCell: (data) => {
+            if (data.section === 'body' && data.column.index === 3) {
+                const category = data.cell.raw;
+                if (category === 'EXTREME') doc.setTextColor(220, 38, 38);
+                else if (category === 'HIGH') doc.setTextColor(217, 119, 6);
+            }
+        }
+    });
+
+    // Footer
+    const pageCount = doc.internal.getNumberOfPages();
+    for (let i = 1; i <= pageCount; i++) {
+        doc.setPage(i);
+        doc.setFontSize(10);
+        doc.setTextColor(128, 128, 128);
+        doc.text(
+            `Generated by Hydro Hub AI | Page ${i} of ${pageCount}`,
+            pageWidth / 2,
+            doc.internal.pageSize.height - 10,
+            { align: 'center' }
+        );
+    }
+
+    doc.save(`${villageData.village.name}_14Day_Forecast.pdf`);
 };

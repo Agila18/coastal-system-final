@@ -15,6 +15,8 @@ import {
 import LoadingSpinner from '../components/LoadingSpinner';
 import ErrorMessage from '../components/ErrorMessage';
 import AnimatedNumber from '../components/AnimatedNumber';
+import { generatePredictionReportPDF } from '../services/pdfGenerator';
+import { Download } from 'lucide-react';
 
 const PredictionModule = () => {
     const { villageId } = useParams();
@@ -147,13 +149,26 @@ const PredictionModule = () => {
                             </p>
                         </div>
 
-                        <button
-                            onClick={() => navigate(`/dashboard/${villageId}`)}
-                            className="flex items-center gap-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition-colors"
-                        >
-                            <ArrowLeft className="w-4 h-4" />
-                            Back to Dashboard
-                        </button>
+                        <div className="flex flex-wrap gap-3">
+                            <motion.button
+                                whileHover={{ scale: 1.05 }}
+                                whileTap={{ scale: 0.95 }}
+                                onClick={() => navigate(`/dashboard/${villageId}`)}
+                                className="flex items-center gap-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition-colors"
+                            >
+                                <ArrowLeft className="w-4 h-4" />
+                                Back
+                            </motion.button>
+                            <motion.button
+                                whileHover={{ scale: 1.05 }}
+                                whileTap={{ scale: 0.95 }}
+                                onClick={() => generatePredictionReportPDF(villageInfo, predictions)}
+                                className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors shadow-lg"
+                            >
+                                <Download className="w-4 h-4" />
+                                Export Prediction PDF
+                            </motion.button>
+                        </div>
                     </div>
                 </div>
 

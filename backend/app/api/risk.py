@@ -26,6 +26,8 @@ def get_village_risk_profile(village_id: int, db: Session = Depends(get_db)):
 
     return {
         "village": village,
+        "district": village.district.name if village.district else "N/A",
+        "state": village.district.state.name if village.district and village.district.state else "N/A",
         "overall_risk_score": assessment.overall_risk_score,
         "risk_scores": {
             "flood": assessment.flood_risk,
