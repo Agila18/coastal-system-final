@@ -1,0 +1,133 @@
+/* Import Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap');
+
+/* Fade-in Animation */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Slide-up Animation */
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(50px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Float Animation for Background Elements */
+@keyframes float {
+
+  0%,
+  100% {
+    transform: translateY(0px);
+    opacity: 0.3;
+  }
+
+  50% {
+    transform: translateY(-20px);
+    opacity: 0.6;
+  }
+}
+
+@keyframes floatDelay {
+
+  0%,
+  100% {
+    transform: translateY(0px);
+    opacity: 0.2;
+  }
+
+  50% {
+    transform: translateY(30px);
+    opacity: 0.5;
+  }
+}
+
+/* Apply Animations */
+.animate-fade-in {
+  animation: fadeIn 0.8s ease-out forwards;
+  opacity: 0;
+}
+
+.animate-fade-in-delay {
+  animation: fadeIn 0.8s ease-out forwards;
+  opacity: 0;
+}
+
+.stats-card {
+  animation: slideUp 0.8s ease-out forwards;
+  opacity: 0;
+  animation-delay: 0.6s;
+}
+
+.stats-card.animation-delay-200 {
+  animation-delay: 0.8s;
+}
+
+.stats-card.animation-delay-400 {
+  animation-delay: 1s;
+}
+
+.animate-float {
+  animation: float 8s ease-in-out infinite;
+}
+
+.animate-float-delay {
+  animation: floatDelay 10s ease-in-out infinite;
+  animation-delay: 1s;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 1024px) {
+  .hero-headline {
+    font-size: clamp(2rem, 4vw, 3.5rem) !important;
+  }
+}
+
+@media (max-width: 768px) {
+
+  /* Adjust stats cards for tablet */
+  .stats-card {
+    min-width: 200px !important;
+  }
+}
+
+@media (max-width: 640px) {
+  .hero-headline {
+    font-size: clamp(1.75rem, 3.5vw, 2.5rem) !important;
+  }
+
+  /* Adjust left margin for mobile - override inline style */
+  [style*="marginLeft"] {
+    margin-left: 1.25rem !important;
+  }
+
+  /* Stack stats cards vertically on mobile */
+  .stats-card {
+    min-width: auto !important;
+    width: 100%;
+  }
+}
+
+/* Button Hover Effects Enhancement */
+button {
+  cursor: pointer;
+  user-select: none;
+}
+
+button:active {
+  transform: scale(0.98) !important;
+}

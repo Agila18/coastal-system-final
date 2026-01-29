@@ -1,0 +1,107 @@
+/* Village Selection Page Animations */
+
+/* Slide-in from right animation */
+@keyframes slideInRight {
+    from {
+        opacity: 0;
+        transform: translateX(100px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+/* Slide-in from bottom animation */
+@keyframes slideInUp {
+    from {
+        opacity: 0;
+        transform: translateY(50px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Fade in animation */
+@keyframes fadeInVillage {
+    from {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+/* Apply animations */
+.slide-in-right {
+    animation: slideInRight 300ms ease-in-out forwards;
+}
+
+.slide-in-up {
+    animation: slideInUp 300ms ease-in-out forwards;
+}
+
+/* Selection card container */
+.selection-card {
+    background: white;
+    border-radius: 1rem;
+    padding: 2rem;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    min-width: 320px;
+    animation: fadeInVillage 400ms ease-out forwards;
+}
+
+/* Option card styling */
+.option-card {
+    background: white;
+    border: 2px solid #E5E7EB;
+    border-radius: 0.75rem;
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 300ms ease-in-out;
+    min-height: 120px;
+    animation: fadeInVillage 300ms ease-out forwards;
+    opacity: 0;
+}
+
+.option-card:hover {
+    transform: scale(1.05);
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    border-color: #0D9488;
+}
+
+.option-card.selected {
+    border-color: #0D9488;
+    border-width: 2px;
+    background: linear-gradient(to bottom right, #F0FDFA, white);
+    box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.1);
+}
+
+/* Responsive adjustments */
+@media (max-width: 1024px) {
+    .selection-card {
+        min-width: 280px;
+    }
+}
+
+@media (max-width: 768px) {
+    .selection-card {
+        width: 100%;
+        min-width: auto;
+    }
+
+    .option-card {
+        min-height: 100px;
+    }
+}
