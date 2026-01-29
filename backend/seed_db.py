@@ -72,12 +72,31 @@ def seed_data():
                 v_code_suffix = v_name[:3].upper()
                 v_code = f"{dist_code}_{v_code_suffix}"
             
-                # Randomized coordinates near a base point
-                base_lat = 13.0 if state.code == "TN" else (10.0 if state.code == "KL" else (17.0 if state.code == "TG" else 20.0))
-                base_lng = 80.0 if state.code == "TN" else (76.0 if state.code == "KL" else (78.0 if state.code == "TG" else 85.0))
+                coord_map = {
+                    "Chennai": (13.05, 80.28),      # Chennai coast
+                    "Kanyakumari": (8.08, 77.54),   # Kanyakumari coast
+                    "Nagapattinam": (10.76, 79.84), # Nagapattinam coast
+                    "Cuddalore": (11.75, 79.77),    # Cuddalore coast
+                    "Thiruvananthapuram": (8.52, 76.94),  # Kerala
+                    "Kollam": (8.88, 76.59),
+                    "Alappuzha": (9.50, 76.34),
+                    "Thrissur": (10.52, 76.21),
+                    "Hyderabad": (17.39, 78.49),    # Telangana (inland)
+                    "Warangal": (18.00, 79.58),
+                    "Nizamabad": (18.67, 78.10),
+                    "Khammam": (17.25, 80.14),
+                    "Puri": (19.81, 85.83),         # Odisha coast
+                    "Ganjam": (19.38, 84.98),
+                    "Balasore": (21.49, 86.93),
+                    "Kendrapara": (20.50, 86.42)
+                }
                 
-                lat = base_lat + random.uniform(-0.5, 0.5)
-                lng = base_lng + random.uniform(-0.5, 0.5)
+                # Default to Chennai if district not found
+                base_coords = coord_map.get(dist_name, (13.05, 80.28))
+                
+                # Small random offset for each village (0.01 to 0.05 degrees ~1-5km)
+                lat = base_coords[0] + random.uniform(-0.05, 0.05)
+                lng = base_coords[1] + random.uniform(-0.05, 0.05)
 
                 village_in = schemas.VillageCreate(
                     name=v_name,

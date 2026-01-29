@@ -261,6 +261,133 @@ const SafetyModule = () => {
                                     </div>
                                 </div>
 
+                                {/* Fisherman Safety Report */}
+                                <div className="bg-gradient-to-br from-cyan-50 to-blue-100 border-2 border-cyan-400 rounded-xl p-6">
+                                    <h3 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
+                                        🚤 FISHERMAN SAFETY REPORT
+                                    </h3>
+
+                                    <div className="space-y-4">
+                                        <div className="bg-white rounded-lg p-4">
+                                            <h4 className="font-bold text-gray-900 mb-2">⚠️ IMMEDIATE ACTIONS:</h4>
+                                            <ul className="space-y-2 text-gray-700 text-sm">
+                                                <li className="flex items-start gap-2">
+                                                    <span className="text-cyan-600">•</span>
+                                                    <span>Check weather forecast before going to sea (IMD: 044-2345-6796)</span>
+                                                </li>
+                                                <li className="flex items-start gap-2">
+                                                    <span className="text-cyan-600">•</span>
+                                                    <span>Secure all fishing boats and equipment on shore</span>
+                                                </li>
+                                                <li className="flex items-start gap-2">
+                                                    <span className="text-cyan-600">•</span>
+                                                    <span>Move boats to safe harbor or inland locations</span>
+                                                </li>
+                                                <li className="flex items-start gap-2">
+                                                    <span className="text-red-600">•</span>
+                                                    <span className="font-semibold">Do NOT venture into the sea if risk score &gt; 60</span>
+                                                </li>
+                                                <li className="flex items-start gap-2">
+                                                    <span className="text-cyan-600">•</span>
+                                                    <span>Register with Coast Guard for emergency tracking</span>
+                                                </li>
+                                            </ul>
+                                        </div>
+
+                                        <div className="bg-white rounded-lg p-4">
+                                            <h4 className="font-bold text-gray-900 mb-2">📋 PREPAREDNESS MEASURES:</h4>
+                                            <ul className="space-y-2 text-gray-700 text-sm">
+                                                <li className="flex items-start gap-2">
+                                                    <span className="text-cyan-600">•</span>
+                                                    <span>Maintain life jackets and safety equipment for all crew members</span>
+                                                </li>
+                                                <li className="flex items-start gap-2">
+                                                    <span className="text-cyan-600">•</span>
+                                                    <span>Keep VHF radio charged and functional (Channel 16 for emergencies)</span>
+                                                </li>
+                                                <li className="flex items-start gap-2">
+                                                    <span className="text-cyan-600">•</span>
+                                                    <span>Stock emergency supplies: flares, first aid kit, drinking water</span>
+                                                </li>
+                                                <li className="flex items-start gap-2">
+                                                    <span className="text-cyan-600">•</span>
+                                                    <span>Know distress signals: SOS, flare procedures</span>
+                                                </li>
+                                                <li className="flex items-start gap-2">
+                                                    <span className="text-cyan-600">•</span>
+                                                    <span>Share fishing route and return time with family/Coast Guard</span>
+                                                </li>
+                                                <li className="flex items-start gap-2">
+                                                    <span className="text-cyan-600">•</span>
+                                                    <span>Install GPS tracker on vessel if possible</span>
+                                                </li>
+                                            </ul>
+                                        </div>
+
+                                        <div className="bg-white rounded-lg p-4">
+                                            <h4 className="font-bold text-gray-900 mb-2">☎️ EMERGENCY CONTACTS:</h4>
+                                            <div className="space-y-2">
+                                                <div className="flex justify-between items-center">
+                                                    <span className="text-gray-700 text-sm">Coast Guard Emergency</span>
+                                                    <a href="tel:1554" className="bg-red-600 text-white px-3 py-1 rounded font-bold text-sm hover:bg-red-700">1554</a>
+                                                </div>
+                                                <div className="flex justify-between items-center">
+                                                    <span className="text-gray-700 text-sm">Marine Police</span>
+                                                    <a href="tel:044-2345-6794" className="bg-blue-600 text-white px-3 py-1 rounded font-bold text-sm hover:bg-blue-700">044-2345-6794</a>
+                                                </div>
+                                                <div className="flex justify-between items-center">
+                                                    <span className="text-gray-700 text-sm">Fisheries Department</span>
+                                                    <a href="tel:044-2345-6795" className="bg-teal-600 text-white px-3 py-1 rounded font-bold text-sm hover:bg-teal-700">044-2345-6795</a>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div className="bg-yellow-50 border border-yellow-300 rounded-lg p-4">
+                                            <h4 className="font-bold text-gray-900 mb-2">🌊 SEA CONDITION WARNINGS:</h4>
+                                            <ul className="space-y-1 text-sm text-gray-700">
+                                                <li className="flex items-start gap-2">
+                                                    <span className="text-red-600">⚠️</span>
+                                                    <span>Wave height &gt; 3m: DO NOT venture out</span>
+                                                </li>
+                                                <li className="flex items-start gap-2">
+                                                    <span className="text-red-600">⚠️</span>
+                                                    <span>Wind speed &gt; 40 kmph: Return to shore immediately</span>
+                                                </li>
+                                                <li className="flex items-start gap-2">
+                                                    <span className="text-red-600">⚠️</span>
+                                                    <span>Cyclone warning issued: Mandatory no-fishing period</span>
+                                                </li>
+                                                <li className="flex items-start gap-2">
+                                                    <span className="text-red-600">⚠️</span>
+                                                    <span>Red flag at harbor: Fishing prohibited</span>
+                                                </li>
+                                            </ul>
+                                        </div>
+
+                                        <div className="bg-white rounded-lg p-4">
+                                            <h4 className="font-bold text-gray-900 mb-2">💼 LIVELIHOOD SUPPORT:</h4>
+                                            <ul className="space-y-2 text-gray-700 text-sm">
+                                                <li className="flex items-start gap-2">
+                                                    <span className="text-cyan-600">•</span>
+                                                    <span>Apply for disaster relief compensation at Fisheries Office</span>
+                                                </li>
+                                                <li className="flex items-start gap-2">
+                                                    <span className="text-cyan-600">•</span>
+                                                    <span>Alternative livelihood training programs available</span>
+                                                </li>
+                                                <li className="flex items-start gap-2">
+                                                    <span className="text-cyan-600">•</span>
+                                                    <span>Boat insurance information: Contact local cooperative</span>
+                                                </li>
+                                                <li className="flex items-start gap-2">
+                                                    <span className="text-cyan-600">•</span>
+                                                    <span>Emergency financial assistance: Contact District Collector</span>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+
                                 {/* Property Protection */}
                                 <div className="bg-white border-2 border-green-300 rounded-xl p-6">
                                     <h3 className="text-xl font-bold text-gray-900 mb-4">

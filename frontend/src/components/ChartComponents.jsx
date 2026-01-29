@@ -61,33 +61,60 @@ export const RiskDistributionPieChart = ({ data }) => {
     );
 };
 
-// 2. Environmental Indicators Horizontal Bar Chart
-export const EnvironmentalBarChart = ({ data }) => {
-    const chartData = [
-        { name: 'Sea Level Rise', value: data.sea_level_rise || 8.5, color: COLORS.red },
-        { name: 'Cyclone Frequency', value: data.cyclone_frequency || 7.2, color: COLORS.orange },
-        { name: 'Storm Surge Height', value: data.storm_surge_height || 8.0, color: COLORS.yellow },
-        { name: 'Erosion Rate', value: data.erosion_rate || 7.5, color: COLORS.orange },
-        { name: 'Extreme Rainfall', value: data.extreme_rainfall || 8.8, color: COLORS.red }
+// 2. Environmental Indicators Bar Chart (Supports Vertical or Horizontal Bars)
+export const EnvironmentalBarChart = ({ data, type = 'all', barLayout = 'horizontal' }) => {
+    // barLayout: 'horizontal' = Horizontal Bars (default)
+    // barLayout: 'vertical'   = Vertical Columns
+
+    const allData = [
+        { name: 'Sea Level Rise', value: data.sea_level_rise || 8.5, color: COLORS.red, types: ['flood', 'all'] },
+        { name: 'Cyclone Frequency', value: data.cyclone_frequency || 7.2, color: COLORS.orange, types: ['cyclone', 'all'] },
+        { name: 'Storm Surge Height', value: data.storm_surge_height || 8.0, color: COLORS.yellow, types: ['flood', 'cyclone', 'all'] },
+        { name: 'Erosion Rate', value: data.erosion_rate || 7.5, color: COLORS.orange, types: ['erosion', 'all'] },
+        { name: 'Extreme Rainfall', value: data.extreme_rainfall || 8.8, color: COLORS.red, types: ['flood', 'cyclone', 'all'] }
     ];
+
+    const chartData = allData.filter(item => item.types.includes(type));
+    const isVerticalColumns = barLayout === 'vertical';
+    const rechartsLayout = isVerticalColumns ? 'horizontal' : 'vertical';
 
     return (
         <ResponsiveContainer width="100%" height={350}>
             <BarChart
                 data={chartData}
-                layout="vertical"
-                margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+                layout={rechartsLayout}
+                margin={{ top: 5, right: 30, left: 20, bottom: isVerticalColumns ? 60 : 5 }}
             >
                 <CartesianGrid strokeDasharray="3 3" />
-                <XAxis type="number" domain={[0, 10]} hide />
-                <YAxis
-                    dataKey="name"
-                    type="category"
-                    width={100}
-                    tick={{ fontSize: 10 }}
-                />
+
+                {isVerticalColumns ? (
+                    // Vertical Columns: X=Name, Y=Value
+                    <>
+                        <XAxis
+                            dataKey="name"
+                            interval={0}
+                            angle={-45}
+                            textAnchor="end"
+                            height={80}
+                            tick={{ fontSize: 10 }}
+                        />
+                        <YAxis type="number" domain={[0, 10]} />
+                    </>
+                ) : (
+                    // Horizontal Bars: X=Value, Y=Name
+                    <>
+                        <XAxis type="number" domain={[0, 10]} hide />
+                        <YAxis
+                            dataKey="name"
+                            type="category"
+                            width={100}
+                            tick={{ fontSize: 10 }}
+                        />
+                    </>
+                )}
+
                 <Tooltip />
-                <Bar dataKey="value" radius={[0, 8, 8, 0]}>
+                <Bar dataKey="value" radius={isVerticalColumns ? [8, 8, 0, 0] : [0, 8, 8, 0]}>
                     {chartData.map((entry, index) => (
                         <Cell key={`cell-${index}`} fill={entry.color} />
                     ))}
@@ -192,12 +219,15 @@ export const SettlementRadarChart = ({ data }) => {
 export const TrendLineChart = ({ historicalData }) => {
     // Sample data structure - replace with actual historical data
     const chartData = historicalData || [
-        { year: '2020', seaLevel: 6.2, cyclone: 2.5, erosion: 3.0 },
-        { year: '2021', seaLevel: 6.8, cyclone: 2.3, erosion: 3.4 },
-        { year: '2022', seaLevel: 7.3, cyclone: 2.5, erosion: 3.8 },
-        { year: '2023', seaLevel: 7.9, cyclone: 2.6, erosion: 4.1 },
-        { year: '2024', seaLevel: 8.4, cyclone: 2.5, erosion: 4.3 },
-        { year: '2025', seaLevel: 8.9, cyclone: 2.4, erosion: 4.2 }
+        { year: '2017', seaLevel: 5.5, cyclone: 2.3, erosion: 2.5 },
+        { year: '2018', seaLevel: 5.9, cyclone: 2.4, erosion: 2.7 },
+        { year: '2019', seaLevel: 6.1, cyclone: 2.4, erosion: 2.9 },
+        { year: '2020', seaLevel: 6.5, cyclone: 2.6, erosion: 3.2 },
+        { year: '2021', seaLevel: 7.0, cyclone: 2.5, erosion: 3.5 },
+        { year: '2022', seaLevel: 7.5, cyclone: 2.7, erosion: 3.9 },
+        { year: '2023', seaLevel: 8.0, cyclone: 2.6, erosion: 4.2 },
+        { year: '2024', seaLevel: 8.5, cyclone: 2.7, erosion: 4.5 },
+        { year: '2025', seaLevel: 9.0, cyclone: 2.5, erosion: 4.3 }
     ];
 
     return (
@@ -243,12 +273,15 @@ export const TrendLineChart = ({ historicalData }) => {
 // 7. Extreme Rainfall Area Chart
 export const RainfallAreaChart = ({ historicalData }) => {
     const chartData = historicalData || [
-        { year: '2020', rainfall: 210 },
-        { year: '2021', rainfall: 220 },
-        { year: '2022', rainfall: 230 },
-        { year: '2023', rainfall: 235 },
-        { year: '2024', rainfall: 245 },
-        { year: '2025', rainfall: 250 }
+        { year: '2017', rainfall: 195 },
+        { year: '2018', rainfall: 202 },
+        { year: '2019', rainfall: 208 },
+        { year: '2020', rainfall: 215 },
+        { year: '2021', rainfall: 225 },
+        { year: '2022', rainfall: 235 },
+        { year: '2023', rainfall: 242 },
+        { year: '2024', rainfall: 250 },
+        { year: '2025', rainfall: 258 }
     ];
 
     return (
@@ -290,7 +323,7 @@ export const RiskChartsTabView = ({ activeTab, environmentalData, settlementData
                 <div className="space-y-8">
                     <div>
                         <h3 className="text-xl font-bold text-gray-900 mb-4">Flood Risk Indicators</h3>
-                        <EnvironmentalBarChart data={environmentalData} />
+                        <EnvironmentalBarChart data={environmentalData} type="flood" />
                     </div>
                     <div>
                         <h3 className="text-xl font-bold text-gray-900 mb-4">Environmental Risk Profile</h3>
@@ -303,7 +336,7 @@ export const RiskChartsTabView = ({ activeTab, environmentalData, settlementData
                 <div className="space-y-8">
                     <div>
                         <h3 className="text-xl font-bold text-gray-900 mb-4">Cyclone Risk Factors</h3>
-                        <EnvironmentalBarChart data={environmentalData} />
+                        <EnvironmentalBarChart data={environmentalData} type="cyclone" barLayout="vertical" />
                     </div>
                 </div>
             )}
@@ -333,7 +366,7 @@ export const RiskChartsTabView = ({ activeTab, environmentalData, settlementData
             {activeTab === 'trends' && (
                 <div className="space-y-8">
                     <div>
-                        <h3 className="text-xl font-bold text-gray-900 mb-4">Historical Trends (2020-2025)</h3>
+                        <h3 className="text-xl font-bold text-gray-900 mb-4">Historical Trends (2017-2025)</h3>
                         <TrendLineChart historicalData={historicalData} />
                     </div>
                 </div>

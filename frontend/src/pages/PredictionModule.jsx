@@ -32,7 +32,7 @@ const PredictionModule = () => {
     const [simParams, setSimParams] = useState({
         slr: null,
         rainfall: null,
-        population: null,
+        erosion: null,
         surge: null
     });
 
@@ -64,13 +64,13 @@ const PredictionModule = () => {
             setPredictions(predResponse.data);
             setVillageInfo(villageResponse.data);
 
-            // Initialize simulation params from actual data if not set
+            // Initialize simulation params to start from 1
             if (!isBackground && villageResponse.data) {
                 setSimParams({
-                    slr: villageResponse.data.environmental?.sea_level_rise || 5,
-                    rainfall: villageResponse.data.environmental?.extreme_rainfall || 5,
-                    population: villageResponse.data.settlement?.population_density || 5,
-                    surge: villageResponse.data.environmental?.storm_surge_height || 5
+                    slr: 1,
+                    rainfall: 1,
+                    erosion: 1,
+                    surge: 1
                 });
             }
         } catch (err) {
@@ -122,6 +122,28 @@ const PredictionModule = () => {
     const highestRisk = disasterTypes.reduce((max, type) =>
         type.probability > max.probability ? type : max
     );
+
+    // Calculate dynamic impact scores based on actual prediction data
+    const avgRiskScore = forecast.reduce((acc, curr) => acc + curr.predicted_risk_score, 0) / forecast.length;
+
+    // Economic Impact - based on average risk and village data
+    const dynamicEconomicImpact = Math.min(10, Math.round((avgRiskScore / 10)));
+    const baseCostPerHousehold = 0.5; // Crores
+    const totalHouseholds = villageInfo.settlement?.households || 1000;
+    const riskMultiplier = dynamicEconomicImpact / 10;
+    const minCost = Math.round(totalHouseholds * baseCostPerHousehold * riskMultiplier);
+    const maxCost = Math.round(totalHouseholds * baseCostPerHousehold * riskMultiplier * 1.5);
+
+    // Community Impact - based on population density and risk
+    const populationDensity = villageInfo.settlement?.population_density || 5;
+    const dynamicCommunityImpact = Math.min(10, Math.round((populationDensity * avgRiskScore) / 100));
+    const avgPeoplePerHousehold = 5;
+    const totalPopulation = totalHouseholds * avgPeoplePerHousehold;
+    const populationAtRisk = Math.round(totalPopulation * (dynamicCommunityImpact / 10));
+    const householdsAtRisk = Math.round(populationAtRisk / avgPeoplePerHousehold);
+    const elderlyAtRisk = Math.round(populationAtRisk * 0.14); // 14% elderly
+    const childrenAtRisk = Math.round(populationAtRisk * 0.28); // 28% children
+    const disabledAtRisk = Math.round(populationAtRisk * 0.03); // 3% disabled
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-teal-50">
@@ -209,7 +231,7 @@ const PredictionModule = () => {
                                 { id: 'slr', label: 'Sea Level Rise', min: 1, max: 10, unit: 'mm/y', icon: '🌊' },
                                 { id: 'rainfall', label: 'Rainfall Intensity', min: 1, max: 10, unit: 'mm', icon: '🌧️' },
                                 { id: 'surge', label: 'Storm Surge', min: 1, max: 10, unit: 'm', icon: '🚢' },
-                                { id: 'population', label: 'Population Density', min: 1, max: 10, unit: 'p/km²', icon: '👥' }
+                                { id: 'erosion', label: 'Erosion Level', min: 1, max: 10, unit: 'cm/yr', icon: '⚠️' }
                             ].map((param) => (
                                 <div key={param.id} className="space-y-3">
                                     <div className="flex justify-between text-sm font-semibold">
@@ -406,13 +428,13 @@ const PredictionModule = () => {
                                 <div className="flex justify-between items-center mb-2">
                                     <span className="text-gray-700 font-semibold">Impact Score</span>
                                     <span className="text-3xl font-bold text-green-700">
-                                        <AnimatedNumber value={predictions.economic_impact_score} duration={1} />/10
+                                        <AnimatedNumber value={dynamicEconomicImpact} duration={1} />/10
                                     </span>
                                 </div>
                                 <div className="w-full bg-gray-200 rounded-full h-3 overflow-hidden">
                                     <motion.div
                                         initial={{ width: 0 }}
-                                        animate={{ width: `${predictions.economic_impact_score * 10}%` }}
+                                        animate={{ width: `${dynamicEconomicImpact * 10}%` }}
                                         transition={{ duration: 1, ease: "easeOut" }}
                                         className="bg-green-600 h-3 rounded-full"
                                     ></motion.div>
@@ -424,24 +446,24 @@ const PredictionModule = () => {
                                 <div>
                                     <p className="font-semibold text-gray-900 mb-1">Infrastructure Damage:</p>
                                     <ul className="list-disc list-inside text-gray-700 text-sm space-y-1">
-                                        <li>Roads: {predictions.economic_impact_score >= 7 ? 'High' : predictions.economic_impact_score >= 4 ? 'Moderate' : 'Low'}</li>
-                                        <li>Buildings: {predictions.economic_impact_score >= 7 ? 'High' : predictions.economic_impact_score >= 4 ? 'Moderate' : 'Low'}</li>
-                                        <li>Utilities: {predictions.economic_impact_score >= 7 ? 'High' : predictions.economic_impact_score >= 4 ? 'Moderate' : 'Low'}</li>
+                                        <li>Roads: {dynamicEconomicImpact >= 7 ? 'High' : dynamicEconomicImpact >= 4 ? 'Moderate' : 'Low'}</li>
+                                        <li>Buildings: {dynamicEconomicImpact >= 7 ? 'High' : dynamicEconomicImpact >= 4 ? 'Moderate' : 'Low'}</li>
+                                        <li>Utilities: {dynamicEconomicImpact >= 7 ? 'High' : dynamicEconomicImpact >= 4 ? 'Moderate' : 'Low'}</li>
                                     </ul>
                                 </div>
 
                                 <div>
                                     <p className="font-semibold text-gray-900 mb-1">Estimated Cost:</p>
                                     <p className="text-gray-700">
-                                        ₹{(predictions.economic_impact_score * 10).toFixed(0)}-{(predictions.economic_impact_score * 15).toFixed(0)} Crores
+                                        ₹{minCost}-{maxCost} Crores
                                     </p>
                                 </div>
 
                                 <div>
                                     <p className="font-semibold text-gray-900 mb-1">Recovery Time:</p>
                                     <p className="text-gray-700">
-                                        {predictions.economic_impact_score >= 7 ? '9-15 months' :
-                                            predictions.economic_impact_score >= 4 ? '6-9 months' : '3-6 months'}
+                                        {dynamicEconomicImpact >= 7 ? '9-15 months' :
+                                            dynamicEconomicImpact >= 4 ? '6-9 months' : '3-6 months'}
                                     </p>
                                 </div>
 
@@ -473,13 +495,13 @@ const PredictionModule = () => {
                                 <div className="flex justify-between items-center mb-2">
                                     <span className="text-gray-700 font-semibold">Impact Score</span>
                                     <span className="text-3xl font-bold text-blue-700">
-                                        <AnimatedNumber value={predictions.community_impact_score} duration={1} />/10
+                                        <AnimatedNumber value={dynamicCommunityImpact} duration={1} />/10
                                     </span>
                                 </div>
                                 <div className="w-full bg-gray-200 rounded-full h-3 overflow-hidden">
                                     <motion.div
                                         initial={{ width: 0 }}
-                                        animate={{ width: `${predictions.community_impact_score * 10}%` }}
+                                        animate={{ width: `${dynamicCommunityImpact * 10}%` }}
                                         transition={{ duration: 1, ease: "easeOut" }}
                                         className="bg-blue-600 h-3 rounded-full"
                                     ></motion.div>
@@ -491,31 +513,31 @@ const PredictionModule = () => {
                                 <div>
                                     <p className="font-semibold text-gray-900 mb-1">Population at Risk:</p>
                                     <p className="text-gray-700">
-                                        {(predictions.community_impact_score * 1500).toFixed(0)} people
+                                        {populationAtRisk.toLocaleString()} people
                                     </p>
                                 </div>
 
                                 <div>
                                     <p className="font-semibold text-gray-900 mb-1">Households at Risk:</p>
                                     <p className="text-gray-700">
-                                        {(predictions.community_impact_score * 350).toFixed(0)} households
+                                        {householdsAtRisk.toLocaleString()} households
                                     </p>
                                 </div>
 
                                 <div>
                                     <p className="font-semibold text-gray-900 mb-1">Vulnerable Groups:</p>
                                     <ul className="list-disc list-inside text-gray-700 text-sm space-y-1">
-                                        <li>Elderly: {(predictions.community_impact_score * 210).toFixed(0)} people</li>
-                                        <li>Children: {(predictions.community_impact_score * 420).toFixed(0)} people</li>
-                                        <li>Disabled: {(predictions.community_impact_score * 45).toFixed(0)} people</li>
+                                        <li>Elderly: {elderlyAtRisk.toLocaleString()} people</li>
+                                        <li>Children: {childrenAtRisk.toLocaleString()} people</li>
+                                        <li>Disabled: {disabledAtRisk.toLocaleString()} people</li>
                                     </ul>
                                 </div>
 
                                 <div>
                                     <p className="font-semibold text-gray-900 mb-1">Healthcare Access:</p>
                                     <p className="text-gray-700">
-                                        {predictions.community_impact_score >= 7 ? 'Limited (Primary Health Center 15km away)' :
-                                            predictions.community_impact_score >= 4 ? 'Moderate (Clinic 8km away)' :
+                                        {dynamicCommunityImpact >= 7 ? 'Limited (Primary Health Center 15km away)' :
+                                            dynamicCommunityImpact >= 4 ? 'Moderate (Clinic 8km away)' :
                                                 'Good (Health center within 3km)'}
                                     </p>
                                 </div>
@@ -524,8 +546,8 @@ const PredictionModule = () => {
                                     <p className="font-semibold text-gray-900 mb-1">Evacuation Needs:</p>
                                     <ul className="list-disc list-inside text-gray-700 text-sm">
                                         <li>Shelters available: 3</li>
-                                        <li>Capacity: {(predictions.community_impact_score * 800).toFixed(0)} people</li>
-                                        <li>Additional needed: {(predictions.community_impact_score * 700).toFixed(0)} people</li>
+                                        <li>Capacity: {Math.round(populationAtRisk * 0.6).toLocaleString()} people</li>
+                                        <li>Additional needed: {Math.round(populationAtRisk * 0.4).toLocaleString()} people</li>
                                     </ul>
                                 </div>
                             </div>
